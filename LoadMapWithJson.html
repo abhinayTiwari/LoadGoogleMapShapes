@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Drawing Tools</title>
+    <meta name="viewport" content="initial-scale=1.0, user-scalable=no">
+    <meta charset="utf-8">
+    <style>
+      /* Always set the map height explicitly to define the size of the div
+       * element that contains the map. */
+      #map {
+        height: 100%;
+        width: 500px;
+        height: 500px;
+      }
+      /* Optional: Makes the sample page fill the window. */
+      html, body {
+        height: 100%;
+        margin: 0;
+        padding: 0;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="map"></div>
+    <div>
+        <input id="jsonDataPath" type="text" placeholder="Provide Json Path here"><button id="loadData">Load Data</button>
+    </div>
+    <a href="index.html">Create Polygon and Download Json</a>
+    <script>
+        var map;
+      function initMap() {
+            map = new google.maps.Map(document.getElementById('map'), {
+            zoom: 4,
+            center: {lat: -28, lng: 137}
+        });
+      }
+
+      function loadData(event){
+        let path = document.getElementById("jsonDataPath").value;
+        map.data.loadGeoJson(path);
+
+       // map.data.add({geometry: new google.maps.Data.Polygon([outerCoords])});
+      }
+      document.getElementById("loadData").addEventListener("click", loadData);
+
+    </script>
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDIGtarzbXMuXR5DjVyl1Dn6-krxLqCvuc&libraries=drawing&callback=initMap"
+         async defer></script>
+  </body>
+</html>
