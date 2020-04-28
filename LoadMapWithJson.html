@@ -35,11 +35,10 @@
         });
       }
 
+      //example: https://raw.githubusercontent.com/abhinayTiwari/LoadGoogleMapShapes/master/json/data.json
       function loadData(event){
         let path = document.getElementById("jsonDataPath").value;
         map.data.loadGeoJson(path);
-
-       // map.data.add({geometry: new google.maps.Data.Polygon([outerCoords])});
       }
       document.getElementById("loadData").addEventListener("click", loadData);
 
