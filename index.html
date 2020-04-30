@@ -1,71 +1,37 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title>Drawing Tools</title>
+    <title>SG Geo JSON</title>
     <meta name="viewport" content="initial-scale=1.0, user-scalable=no">
     <meta charset="utf-8">
-    <style>
-      /* Always set the map height explicitly to define the size of the div
-       * element that contains the map. */
-      #map {
-        height: 100%;
-        width: 500px;
-        height: 500px;
-      }
-      /* Optional: Makes the sample page fill the window. */
-      html, body {
-        height: 100%;
-        margin: 0;
-        padding: 0;
-      }
-    </style>
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDIGtarzbXMuXR5DjVyl1Dn6-krxLqCvuc&libraries=drawing"></script>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+    <link rel="stylesheet" href="./css/stylesheet.css">
   </head>
   <body>
-    <div id="map"></div>
-    <div id="info"></div>
-    <div>
-        <button>Download Json Data Of Current Polygons</button>
+    <nav class="navbar bg-dark text-light">
+      <div class="navbar-brand">
+          <img class="img" src="img/mobicon_icon_mono.png">
+          <span style="padding-left:10px">SG Geo JSON</span>
+      </div>
+      <a class="navigation-tab" onclick="alert('Under development')">Draw using GeoJSON File</a>
+    </nav>
+    <div id="instructions">
+      <div>Instructions:</div>
+      <ol>
+        <li>Using the Drawing tool <img id="polygon-img" src="img/polygon-button.png" alt="">, draw any geometry shape in the below map.</li>
+        <li>Click on the "Download Geo Json" button to download the Json file</li>
+        <li>Click <a href="img/Instruction.gif" target="_blank" style="font-weight: bold;">here</a> to see the Animated Gif for the same.</li> 
+      </ol>
     </div>
-    <a href="LoadMapWithJson.html">Load JSON Data</a>
-    <script>
-        var map;
-        var polygonArray = [];
-      function initMap() {
-            map = new google.maps.Map(document.getElementById('map'), {
-            zoom: 4,
-            center: {lat: -28, lng: 137}
-        });
-        var drawingManager = new google.maps.drawing.DrawingManager({
-          drawingMode: google.maps.drawing.OverlayType.MARKER,
-          drawingControl: true,
-          drawingControlOptions: {
-            position: google.maps.ControlPosition.TOP_CENTER,
-            drawingModes: ['marker', 'circle', 'polygon', 'polyline', 'rectangle']
-          },
-          markerOptions: {icon: 'https://developers.google.com/maps/documentation/javascript/examples/full/images/beachflag.png'},
-          circleOptions: {
-            fillColor: '#ffff00',
-            fillOpacity: 1,
-            strokeWeight: 5,
-            clickable: false,
-            editable: true,
-            zIndex: 1
-          }
-        });
-        drawingManager.setMap(map);
 
-        google.maps.event.addListener(drawingManager, 'polygoncomplete', function (polygon) {
-            debugger
-            document.getElementById('info').innerHTML += "polygon points:" + "<br>";
-            for (var i = 0; i < polygon.getPath().getLength(); i++) {
-                document.getElementById('info').innerHTML += polygon.getPath().getAt(i).toUrlValue(6) + "<br>";
-            }
-            polygonArray.push(polygon);
-        });
-      }
-
-    </script>
-    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDIGtarzbXMuXR5DjVyl1Dn6-krxLqCvuc&libraries=drawing&callback=initMap"
-         async defer></script>
+    <div id="main-container">
+      <div id="map"></div>
+      <div>
+        <button id="downloadGeoJSON">Download Geo JSON File</button>
+      </div>
+    </div>
+    <script src="js/index.js"></script>
+    
   </body>
 </html>

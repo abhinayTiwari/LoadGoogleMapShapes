@@ -5,28 +5,16 @@
     <meta name="viewport" content="initial-scale=1.0, user-scalable=no">
     <meta charset="utf-8">
     <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDIGtarzbXMuXR5DjVyl1Dn6-krxLqCvuc&libraries=drawing"></script>
-    <style>
-      /* Always set the map height explicitly to define the size of the div
-       * element that contains the map. */
-      #map {
-        height: 100%;
-        width: 500px;
-        height: 500px;
-      }
-      /* Optional: Makes the sample page fill the window. */
-      html, body {
-        height: 100%;
-        margin: 0;
-        padding: 0;
-      }
-    </style>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+    <link rel="stylesheet" href="./css/stylesheet.css">
   </head>
   <body>
+    <a href="index.html">Create Polygon and Download Json</a>
     <div id="map"></div>
     <div>
         <input id="jsonDataPath" type="text" placeholder="Provide Json Path here"><button id="loadData">Load Data</button>
     </div>
-    <a href="index.html">Create Polygon and Download Json</a>
+    
     <script>
         var map;
       function initMap() {

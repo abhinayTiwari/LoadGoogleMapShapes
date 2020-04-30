@@ -1,100 +1,138 @@
-window.onload = function () { 
-// var geocoder;
-// var map;
-// var polygonArray = [];
-
-// function initMap() {
-//     map = new google.maps.Map(document.getElementById('map'), {
-//       zoom: 4,
-//       center: {lat: -28, lng: 137}
-//     });
-  
-//     // NOTE: This uses cross-domain XHR, and may not work on older browsers.
-//     map.data.loadGeoJson(
-//         'https://storage.googleapis.com/mapsdevsite/json/google.json');
-//   }
-
-// function initialize() {
-//     map = new google.maps.Map(
-//     document.getElementById("map_canvas"), {
-//         center: new google.maps.LatLng(37.4419, -122.1419),
-//         zoom: 13,
-//         mapTypeId: google.maps.MapTypeId.ROADMAP
-//     });
-//     var drawingManager = new google.maps.drawing.DrawingManager({
-//         drawingMode: google.maps.drawing.OverlayType.POLYGON,
-//         drawingControl: true,
-//         drawingControlOptions: {
-//             position: google.maps.ControlPosition.TOP_CENTER,
-//             drawingModes: [
-//             google.maps.drawing.OverlayType.MARKER,
-//             google.maps.drawing.OverlayType.CIRCLE,
-//             google.maps.drawing.OverlayType.POLYGON,
-//             google.maps.drawing.OverlayType.POLYLINE,
-//             google.maps.drawing.OverlayType.RECTANGLE]
-//         },
-//         markerOptions: {
-//             icon: 'images/car-icon.png'
-//         },
-//         circleOptions: {
-//             fillColor: '#ffff00',
-//             fillOpacity: 1,
-//             strokeWeight: 5,
-//             clickable: false,
-//             editable: true,
-//             zIndex: 1
-//         },
-//         polygonOptions: {
-//             fillColor: '#BCDCF9',
-//             fillOpacity: 0.5,
-//             strokeWeight: 2,
-//             strokeColor: '#57ACF9',
-//             clickable: false,
-//             editable: false,
-//             zIndex: 1
-//         }
-//     });
-//     console.log(drawingManager)
-//     drawingManager.setMap(map)
-
-//     google.maps.event.addListener(drawingManager, 'polygoncomplete', function (polygon) {
-//         document.getElementById('info').innerHTML += "polygon points:" + "<br>";
-//         for (var i = 0; i < polygon.getPath().getLength(); i++) {
-//             document.getElementById('info').innerHTML += polygon.getPath().getAt(i).toUrlValue(6) + "<br>";
-//         }
-//         polygonArray.push(polygon);
-//     });
-
-// }
-// google.maps.event.addDomListener(window, "load", initialize);
-
-var map = new google.maps.Map(document.getElementById('map'), {
-    center: {lat: -34.397, lng: 150.644},
-    zoom: 8
+var map;
+function initialize() {
+    // Create a simple map.
+    map = new google.maps.Map(document.getElementById('map'), {
+      zoom: 4,
+      center: {lat: -28, lng: 137}
   });
-
-function initMap() {
-  
-
-  var drawingManager = new google.maps.drawing.DrawingManager({
+  //adding drawing manager
+    var drawingManager = new google.maps.drawing.DrawingManager({
+    map:map,
     drawingMode: google.maps.drawing.OverlayType.MARKER,
     drawingControl: true,
     drawingControlOptions: {
-      position: google.maps.ControlPosition.TOP_CENTER,
-      drawingModes: ['marker', 'circle', 'polygon', 'polyline', 'rectangle']
-    },
-    markerOptions: {icon: 'https://developers.google.com/maps/documentation/javascript/examples/full/images/beachflag.png'},
-    circleOptions: {
-      fillColor: '#ffff00',
-      fillOpacity: 1,
-      strokeWeight: 5,
-      clickable: false,
-      editable: true,
-      zIndex: 1
+      position: google.maps.ControlPosition.RIGHT_TOP,
+      drawingModes: [
+        google.maps.drawing.OverlayType.MARKER,
+        google.maps.drawing.OverlayType.POLYGON,
+        google.maps.drawing.OverlayType.POLYLINE,
+        google.maps.drawing.OverlayType.CIRCLE,
+        google.maps.drawing.OverlayType.RECTANGLE
+      ]
     }
   });
-  drawingManager.setMap(map);
+
+  google.maps.event.addListener(drawingManager, 'overlaycomplete', function(event) {
+      switch(event.type){
+          case google.maps.drawing.OverlayType.MARKER:
+            map.data.add(new google.maps.Data.Feature({geometry:new google.maps.Data.Point(event.overlay.getPosition())}));
+            break;
+          case google.maps.drawing.OverlayType.RECTANGLE:
+            var b=event.overlay.getBounds(),
+                p=[b.getSouthWest(),{lat:b.getSouthWest().lat(),lng:b.getNorthEast().lng()},b.getNorthEast(),{lng:b.getSouthWest().lng(),lat:b.getNorthEast().lat()}]
+            map.data.add(new google.maps.Data.Feature({geometry:new google.maps.Data.Polygon([p])}));
+            break;
+          case google.maps.drawing.OverlayType.POLYGON:
+            map.data.add(new google.maps.Data.Feature({geometry:new google.maps.Data.Polygon([event.overlay.getPath().getArray()])}));
+            break;
+          case google.maps.drawing.OverlayType.POLYLINE:
+            map.data.add(new google.maps.Data.Feature({geometry:new google.maps.Data.LineString(event.overlay.getPath().getArray())}));
+            break;
+          case google.maps.drawing.OverlayType.CIRCLE:
+            map.data.add(new google.maps.Data.Feature({properties:{radius:event.overlay.getRadius()},geometry:new google.maps.Data.Point(event.overlay.getCenter())}));
+            break;
+      }
+
+    });
+
+    google.maps.Map.prototype.getGeoJson=function(callback){
+        var geo={"type": "FeatureCollection","features": []},
+            fx=function(g,t){
+
+              var that  =[],
+                  arr,
+                  f     = {
+                            MultiLineString :'LineString',
+                            LineString      :'Point',
+                            MultiPolygon    :'Polygon',
+                            Polygon         :'LinearRing',
+                            LinearRing      :'Point',
+                            MultiPoint      :'Point'
+                          };
+            
+              switch(t){
+                case 'Point':
+                  g=(g.get)?g.get():g;
+                  return([g.lng(),g.lat()]);
+                  break;
+                default:
+                  arr= g.getArray();
+                  for(var i=0;i<arr.length;++i){
+                    that.push(fx(arr[i],f[t]));
+                  }
+                  if( t=='LinearRing' 
+                        &&
+                      that[0]!==that[that.length-1]){
+                    that.push([that[0][0],that[0][1]]);
+                  }
+                  return that;
+              }
+            };
+        
+        this.data.forEach(function(feature){
+        var _feature     = {type:'Feature',properties:{}}
+            _id          = feature.getId(),
+            _geometry    = feature.getGeometry(),
+            _type        =_geometry.getType(),
+            _coordinates = fx(_geometry,_type);
+            
+            _feature.geometry={type:_type,coordinates:_coordinates};
+            if(typeof _id==='string'){
+              _feature.id=_id;
+            }
+            
+            geo.features.push(_feature);
+            feature.forEachProperty(function(v,k){
+                _feature.properties[k]=v;
+            });
+        }); 
+        if(typeof callback==='function'){
+          callback(geo);
+        }     
+        return geo;
+      }
+
+     
+  }
+
+
+
+
+
+  //utility functions
+  function download(JSONObj, fileName, contentType) {
+    var content = JSON.stringify(JSONObj);
+      var a = document.createElement("a");
+      var file = new Blob([content], {type: contentType});
+      a.href = URL.createObjectURL(file);
+      a.download = fileName;
+      a.click();
+  }
+
   
-}
-initMap();
-}
+  function downloadJsonData(event){
+    if(map.getGeoJson().features.length == 0){
+      alert("Please draw a shape first in the given map using the 'Draw a Shape' tool");
+      return;
+    }
+    var curTime = new Date().toString().substring(0,24).split(" ").join("")
+    var fileName = `GeoJson ${curTime}.json`;
+    var contentType = "text/plain"
+    download(map.getGeoJson(function(){}), fileName, contentType);
+    alert("Your file has been downloaded successfully.");
+  }
+
+  
+  //Events
+  google.maps.event.addDomListener(window, 'load', initialize);
+  document.getElementById("downloadGeoJSON").addEventListener("click", downloadJsonData);
